@@ -603,6 +603,23 @@ static int sortkind_parser(char const *str, Py_ssize_t length, void *data)
         *sortkind = NPY_STABLESORT;
         return 0;
     }
+    else if (str[0] == 't' || str[0] == 'T') {
+        // Check for "tbsort"
+        // For now, be strict and require the full "tbsort" name
+        // to avoid conflict if other 't' options are added later.
+        char lower_str[7]; // "tbsort\0"
+        if (length == 6) {
+            for (int i = 0; i < 6; ++i) {
+                lower_str[i] = Py_TOLOWER(str[i]);
+            }
+            lower_str[6] = '\0';
+            if (strcmp(lower_str, "tbsort") == 0) {
+                *sortkind = NPY_TBSORT;
+                return 0;
+            }
+        }
+        return -1; // Unknown 't' sort or wrong length
+    }
     else {
         return -1;
     }
@@ -620,7 +637,7 @@ PyArray_SortkindConverter(PyObject *obj, NPY_SORTKIND *sortkind)
     }
     return string_converter_helper(
         obj, (void *)sortkind, sortkind_parser, "sort kind",
-        "must be one of 'quick', 'heap', or 'stable'");
+        "must be one of 'quick', 'heap', 'stable', or 'tbsort'");
 }
 
 static int selectkind_parser(char const *str, Py_ssize_t length, void *data)
