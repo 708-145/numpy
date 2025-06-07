@@ -31,6 +31,7 @@
 #include "npy_sort.h"
 #include "npysort_common.h"
 #include "numpy_tag.h"
+#include "tbstablesort.hpp" // For npy_tbstablesort::TBstablesort
 
 #include <cstdlib>
 
@@ -512,6 +513,12 @@ mergesort_ushort(void *start, npy_intp num, void *NPY_UNUSED(varr))
 NPY_NO_EXPORT int
 mergesort_int(void *start, npy_intp num, void *NPY_UNUSED(varr))
 {
+    if (num > 50) {
+        // Use npy::int_tag, assuming it's compatible/equivalent to npy::tag::SignedInt
+        int tbs_ret = npy_tbstablesort::TBstablesort<npy::int_tag>(static_cast<npy_int *>(start), 0, num - 1);
+        // TBStablesort returns 0 for success, -1 for error (e.g. NPY_ENOMEM).
+        return tbs_ret;
+    }
     return mergesort_<npy::int_tag>((npy_int *)start, num);
 }
 NPY_NO_EXPORT int
@@ -547,6 +554,11 @@ mergesort_half(void *start, npy_intp num, void *NPY_UNUSED(varr))
 NPY_NO_EXPORT int
 mergesort_float(void *start, npy_intp num, void *NPY_UNUSED(varr))
 {
+    if (num > 50) {
+        // Use npy::float_tag, assuming it's compatible/equivalent to npy::tag::Float
+        int tbs_ret = npy_tbstablesort::TBstablesort<npy::float_tag>(static_cast<npy_float *>(start), 0, num - 1);
+        return tbs_ret;
+    }
     return mergesort_<npy::float_tag>((npy_float *)start, num);
 }
 NPY_NO_EXPORT int
