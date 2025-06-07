@@ -35,6 +35,7 @@
 #include "npy_sort.h"
 #include "npysort_common.h"
 #include "numpy_tag.h"
+#include "tbtimsort.hpp" // For npy_tbsort::TBSort
 
 #include <cstdlib>
 #include <utility>
@@ -2767,6 +2768,17 @@ timsort_ushort(void *start, npy_intp num, void *NPY_UNUSED(varr))
 NPY_NO_EXPORT int
 timsort_int(void *start, npy_intp num, void *NPY_UNUSED(varr))
 {
+    if (num > 50) {
+        // Use npy::int_tag, assuming it's compatible/equivalent to npy::tag::SignedInt
+        int tbs_ret = npy_tbsort::TBSort<npy::int_tag>(static_cast<npy_int *>(start), 0, num - 1);
+        // TBSort returns 0 for success, -1 for error.
+        // This matches the expected return convention for sort functions.
+        return tbs_ret;
+        // If TBSort fails, we could optionally fall back to original Timsort,
+        // but for now, we propagate its success/failure.
+        // if (tbs_ret == 0) return 0;
+        // else return tbs_ret; // Or handle error, then fallback:
+    }
     return timsort_<npy::int_tag>(start, num);
 }
 NPY_NO_EXPORT int
@@ -2802,6 +2814,11 @@ timsort_half(void *start, npy_intp num, void *NPY_UNUSED(varr))
 NPY_NO_EXPORT int
 timsort_float(void *start, npy_intp num, void *NPY_UNUSED(varr))
 {
+    if (num > 50) {
+        // Use npy::float_tag, assuming it's compatible/equivalent to npy::tag::Float
+        int tbs_ret = npy_tbsort::TBSort<npy::float_tag>(static_cast<npy_float *>(start), 0, num - 1);
+        return tbs_ret;
+    }
     return timsort_<npy::float_tag>(start, num);
 }
 NPY_NO_EXPORT int
