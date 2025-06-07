@@ -174,9 +174,8 @@ typedef enum {
         NPY_HEAPSORT=1,
         NPY_MERGESORT=2,
         NPY_STABLESORT=2,
-        NPY_TBSORT=3,
 } NPY_SORTKIND;
-#define NPY_NSORTS (NPY_TBSORT + 1)
+#define NPY_NSORTS (NPY_STABLESORT + 1)
 
 
 typedef enum {

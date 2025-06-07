@@ -18,7 +18,6 @@
 
 #include "npy_config.h"
 #include "npy_sort.h"
-#include "tbsort.h" // For npy_tbsort
 #include "abstractdtypes.h"
 #include "common.h"
 #include "ctors.h"
@@ -4163,28 +4162,26 @@ static PyArray_ArrFuncs _Py@NAME@_ArrFuncs = {
         quicksort_@suff@,
         heapsort_@suff@,
         #if @rsort@
-            radixsort_@suff@,
+            radixsort_@suff@
         #else
-            timsort_@suff@,
+            timsort_@suff@
         #endif
-        npy_tbsort  // NPY_TBSORT for all types with compare functions
     },
     {
         aquicksort_@suff@,
         aheapsort_@suff@,
         #if @rsort@
-            aradixsort_@suff@,
+            aradixsort_@suff@
         #else
-            atimsort_@suff@,
+            atimsort_@suff@
         #endif
-        NULL  // No npy_argtbsort yet
     },
-#else // if not @sort@
+#else
     {
-        NULL, NULL, NULL, NULL // NPY_NSORTS is 4
+        NULL, NULL, NULL
     },
     {
-        NULL, NULL, NULL, NULL // NPY_NSORTS is 4
+        NULL, NULL, NULL
     },
 #endif
     NULL,
